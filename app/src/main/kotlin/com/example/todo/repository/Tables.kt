@@ -11,7 +11,7 @@ object Tables {
         val TABLE: Table<*> = DSL.table("users")
         val ID: Field<Long> = DSL.field("id", Long::class.java)
         val EMAIL: Field<String> = DSL.field("email", String::class.java)
-        val PASSWORD: Field<String> = DSL.field("password_hash", String::class.java)
+        val PASSWORD_HASH: Field<String> = DSL.field("password_hash", String::class.java)
     }
 
     object Todos {

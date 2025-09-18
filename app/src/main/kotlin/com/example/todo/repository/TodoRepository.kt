@@ -1,8 +1,10 @@
 package com.example.todo.repository
 
-import org.jooq.DSLContext
+import com.example.todo.config.Database
 
-class TodoRepository(private val dsl: DSLContext) {
+class TodoRepository(private val db: Database) {
+    val dsl = db.dsl()
+
     fun findById(userId: Long, id: Long) = dsl
         .selectFrom(Tables.Todos.TABLE)
         .where(Tables.Todos.ID.eq(id).and(Tables.Todos.USER_ID.eq(userId)))

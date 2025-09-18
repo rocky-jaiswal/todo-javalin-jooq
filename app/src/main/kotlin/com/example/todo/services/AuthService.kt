@@ -11,7 +11,7 @@ class AuthService(private val passwordService: PasswordService, private val user
 
     fun verify(email: String, password: String): Long? {
         val rec = userRepository.findByEmail(email.lowercase()) ?: return null
-        val verified = passwordService.verifyPassword(password, rec.get(Tables.Users.PASSWORD) as String)
+        val verified = passwordService.verifyPassword(password, rec.get(Tables.Users.PASSWORD_HASH) as String)
         return if (verified) (rec.get(Tables.Users.ID) as Long) else null
     }
 }

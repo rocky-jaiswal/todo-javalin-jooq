@@ -1,13 +1,15 @@
 package com.example.todo.repository
 
-import org.jooq.DSLContext
+import com.example.todo.config.Database
 
-class UserRepository(private val dsl: DSLContext) {
+class UserRepository(private val db: Database) {
+    val dsl = db.dsl()
+
     fun findByEmail(email: String) = dsl
         .select(
             Tables.Users.ID,
             Tables.Users.EMAIL,
-            Tables.Users.PASSWORD
+            Tables.Users.PASSWORD_HASH
         )
         .from(Tables.Users.TABLE)
         .where(Tables.Users.EMAIL.eq(email))
@@ -15,11 +17,11 @@ class UserRepository(private val dsl: DSLContext) {
 
     fun findById(id: Long) = dsl.selectFrom(Tables.Users.TABLE)
         .where(Tables.Users.ID.eq(id))
-        .fetchOneInto(Map::class.java)
+        .fetchOne()
 
     fun create(email: String, passwordHash: String) = dsl
         .insertInto(Tables.Users.TABLE)
-        .columns(Tables.Users.EMAIL, Tables.Users.PASSWORD)
+        .columns(Tables.Users.EMAIL, Tables.Users.PASSWORD_HASH)
         .values(email, passwordHash)
         .returningResult(Tables.Users.ID)
         .fetchOne()!![Tables.Users.ID]

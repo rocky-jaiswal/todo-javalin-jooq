@@ -2,59 +2,58 @@ package com.example.todo.config
 
 import com.example.todo.controllers.AuthController
 import com.example.todo.controllers.TodoController
-import com.example.todo.repository.TodoRepository
-import com.example.todo.repository.UserRepository
-import com.example.todo.services.AuthService
-import com.example.todo.services.JWTService
-import com.example.todo.services.PasswordService
-import com.example.todo.services.TodoService
 import io.javalin.apibuilder.ApiBuilder.*
 import io.javalin.config.JavalinConfig
-import io.javalin.http.UnauthorizedResponse
 import org.jooq.impl.DSL
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-fun registerRoutes(config: JavalinConfig, db: Database) {
-    val userRepository = UserRepository(db.dsl())
-    val todoRepository = TodoRepository(db.dsl())
+class Routes(
+    private val db: Database,
+    private val authController: AuthController,
+    private val todoController: TodoController) {
 
-    val jwtService = JWTService()
-    val passwordService = PasswordService()
-    val authService = AuthService(passwordService, userRepository)
-    val todoService = TodoService(todoRepository)
+    private val logger: Logger = LoggerFactory.getLogger(Routes::class.java)
 
-    val authMiddleware = AuthMiddleware(jwtService)
+    fun registerRoutes(config: JavalinConfig) {
+        config.router.apiBuilder {
+            path("/api/public/health") {
+                before {
+                        ctx -> logger.info("1")
+                }
+                before {
+                        ctx -> logger.info("2")
+                }
+                before {
+                        ctx -> logger.info("3")
+                }
+                get() {
+                    // StructuredLogging.LoggingUtils.logApiCall(logger, "/health", "get", null, null)
 
-    val authController = AuthController(jwtService, authService)
-    val todoController = TodoController(todoService)
+                    val ts = db.dsl()
+                        .select(DSL.currentTimestamp())
+                        .fetchOne(DSL.currentTimestamp())!!
 
-    config.router.apiBuilder {
-        path("/api/health") {
-            get() {
-                val ts = db.dsl()
-                    .select(DSL.currentTimestamp())
-                    .fetchOne(DSL.currentTimestamp())!!
+                    it.json(mapOf("status" to "ok", "date" to ts.toString()))
+                }
+            }
 
-                it.json(mapOf("status" to "ok", "date" to ts.toString()))
+            path ("/api/auth") {
+                path("/register") { post(authController::register) }
+                path("/login") { post(authController::login) }
+            }
+
+            path("/api/todos") {
+                get(todoController::list)
+                post(todoController::create)
+                path("{id}") {
+                    get(todoController::get)
+                    put(todoController::update)
+                    delete(todoController::delete)
+                }
             }
         }
-
-        path ("/api/auth") {
-            path("/register") { post(authController::register) }
-            path("/login") { post(authController::login) }
-        }
-
-        path("/api/todos") {
-            before { ctx ->
-                if (!authMiddleware.authenticate(ctx)) throw UnauthorizedResponse("unauthorized access")
-            }
-            get(todoController::list)
-            post(todoController::create)
-            path("{id}") {
-                get(todoController::get)
-                put(todoController::update)
-                delete(todoController::delete)
-            }
-        }
+        // app.exception(ValidationException::class.java) { e, ctx -> todos.handleValidationErrors(e, ctx) }
     }
-    // app.exception(ValidationException::class.java) { e, ctx -> todos.handleValidationErrors(e, ctx) }
 }
+

@@ -30,9 +30,9 @@ class JWTService {
     private val verifier: RSASSAVerifier
 
     companion object {
-        private const val KEY_PASSWORD = Secrets.KEY_PASSWORD
-        private const val PRIVATE_KEY_FILE = "configuration/private_key_encrypted.pem"
-        private const val PUBLIC_KEY_FILE = "configuration/public_key.pem"
+        private val KEY_PASSWORD = Secrets.KEY_PASSWORD
+        private const val PRIVATE_KEY_FILE = "keys/private_key_encrypted.pem"
+        private const val PUBLIC_KEY_FILE = "keys/public_key.pem"
 
         init {
             // Add BouncyCastle provider for PEM parsing
@@ -125,7 +125,7 @@ class JWTService {
      * Load RSA private key from PEM file with passphrase
      */
     // @Throws(Exception::class)
-    private fun loadPrivateKey(filePath: String, passphrase: String): RSAPrivateKey? {
+    private fun loadPrivateKey(filePath: String, passphrase: String): RSAPrivateKey {
         FileReader(filePath).use { fileReader ->
             PEMParser(fileReader).use { pemParser ->
                 val pemObject = pemParser.readObject() as PKCS8EncryptedPrivateKeyInfo
@@ -151,14 +151,14 @@ class JWTService {
      * Load RSA public key from PEM file
      */
     // @Throws(Exception::class)
-    private fun loadPublicKey(filePath: String): RSAPublicKey? {
+    private fun loadPublicKey(filePath: String): RSAPublicKey {
         FileReader(filePath).use { fileReader ->
             PEMParser(fileReader).use { pemParser ->
                 val pemObject: Any? = pemParser.readObject()
                 val converter: JcaPEMKeyConverter = JcaPEMKeyConverter().setProvider("BC")
 
                 if (pemObject is SubjectPublicKeyInfo) {
-                    return converter.getPublicKey(pemObject) as RSAPublicKey?
+                    return converter.getPublicKey(pemObject) as RSAPublicKey
                 } else {
                     throw IllegalArgumentException("Unsupported PEM object type for public key")
                 }

@@ -7,12 +7,18 @@
 - Fix queries (CRUD User + Todos) ✅
 - JWT (with RSA) ✅
 - Auth middleware ✅
-- Secret management (dotenv, .properties, .yaml)
-- Application config (.properties / .yaml)
+- Koin ✅
+- CORS ✅
+- Secret management (dotenv, .properties, .yaml) (dotenvx) ✅
+- Request validation (Konform) ✅
+- Code cleanup (app entry ✅, middlewares ✅)
+- Setup in command + Result monad
 - Exception handling & reporting (40x vs 50x)
-- Good logging
+- JSON serialization (Date etc.)
+- Java dates (store and send in UTC)
+- Good logging (incl. exceptions)
 - Check build
 - Unit tests
 - Integration tests (test containers)
 - Lint & editorconfig
-- Koin (?)
+- Gradle cleanup (version lock etc.)

@@ -6,6 +6,8 @@ plugins {
     application
 
     id("org.flywaydb.flyway") version "11.11.1"
+
+    alias(libs.plugins.ktor)
 }
 
 repositories {
@@ -33,15 +35,55 @@ dependencies {
     implementation("at.favre.lib:bcrypt:0.10.2")
     implementation("com.nimbusds:nimbus-jose-jwt:10.4.2")
 
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
+
     // BouncyCastle for PEM & Argon2id
     implementation("org.bouncycastle:bcprov-jdk18on:1.81")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.81")
 
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
-
     // Logging
     implementation("ch.qos.logback:logback-classic:1.5.18")
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    // Jackson for JSON encoding
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    // Logback JSON encoder
+    implementation("net.logstash.logback:logstash-logback-encoder:7.4")
+    // Optional: Structured Logging for better MDC support
+    implementation("org.slf4j:slf4j-ext:2.0.17")
+
+    // Validation
+    implementation("io.konform:konform-jvm:0.11.0")
+
+    // DI
+    implementation("io.insert-koin:koin-core:4.1.1")
+    implementation("io.insert-koin:koin-logger-slf4j:4.1.1")
+
+    // dotenv
+    implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
+
+    // Ktor
+    implementation(libs.ktor.server.jetty.jakarta)
+    implementation(libs.ktor.server.auth)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.auth.jwt)
+    implementation(libs.ktor.server.call.logging)
+    implementation(libs.ktor.server.resources)
+    implementation(libs.ktor.server.request.validation)
+    implementation(libs.ktor.server.openapi)
+    implementation(libs.ktor.server.cors)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.serialization.jackson)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.status.pages)
+    implementation(libs.logback.classic)
+    implementation(libs.ktor.server.config.yaml)
+    testImplementation(libs.ktor.server.test.host)
+
+    // http4k
+//    implementation("org.http4k:http4k-core:6.17.0.0")
+//    implementation("org.http4k:http4k-server-jetty:6.17.0.0")
+//    implementation("org.http4k:http4k-format-jackson:6.17.0.0")
 
     // Tests
     testImplementation(kotlin("test"))
