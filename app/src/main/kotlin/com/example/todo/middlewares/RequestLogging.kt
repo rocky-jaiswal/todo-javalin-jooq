@@ -169,6 +169,7 @@ object RequestLogging {
         return value
     }
 
+    // TODO: Fix me
     private fun extractUserId(ctx: Context): String? {
         // Example: Extract from custom header
         val userIdHeader = ctx.header("X-User-Id")
@@ -187,6 +188,7 @@ object RequestLogging {
         return null
     }
 
+    // TODO: Fix me
     private fun extractSessionId(ctx: Context): String? {
         // Example: Extract from cookie
         val sessionCookie = ctx.cookie("JSESSIONID")
@@ -199,6 +201,7 @@ object RequestLogging {
         return ctx.header("X-Session-Id")
     }
 
+    // TODO: Fix me
     private fun getClientIp(ctx: Context): String {
         // Check for forwarded headers first
         val xForwardedFor = ctx.header("X-Forwarded-For")

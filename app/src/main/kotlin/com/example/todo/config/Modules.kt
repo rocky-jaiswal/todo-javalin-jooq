@@ -1,5 +1,7 @@
 package com.example.todo.config
 
+import com.example.todo.commands.AuthCommand
+import com.example.todo.commands.TodoCommand
 import com.example.todo.controllers.AuthController
 import com.example.todo.controllers.TodoController
 import com.example.todo.middlewares.AuthMiddleware
@@ -25,6 +27,9 @@ val appModule = module {
     singleOf(::TodoService)
 
     singleOf(::AuthMiddleware)
+
+    singleOf(::AuthCommand)
+    singleOf(::TodoCommand)
 
     singleOf(::AuthController)
     singleOf(::TodoController)

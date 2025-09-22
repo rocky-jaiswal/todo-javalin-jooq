@@ -1,23 +1,26 @@
 package com.example.todo.services
 
-import com.example.todo.dto.CreateTodoRequest
-import com.example.todo.dto.UpdateTodoRequest
 import com.example.todo.model.Todo
 import com.example.todo.repository.TodoRepository
-import java.time.OffsetDateTime
 
-class TodoService(private val repo: TodoRepository) {
-    fun list(userId: Long, offset: Int = 0, limit: Int = 100): List<Todo> = listOf<Todo>()
-
-    fun get(userId: Long, id: Long) = repo.findById(userId, id)
-
-    fun create(userId: Long, req: CreateTodoRequest): Todo? {
-        val id = repo.insert(userId, req.title)
-        return if (id != null) Todo(id, userId, req.title) else null
+class TodoService(private val todoRepository: TodoRepository) {
+    fun list(userId: Long): List<Todo> {
+        return todoRepository.findAllForUserId(userId)
     }
 
-    fun update(userId: Long, id: Long, req: UpdateTodoRequest): Todo? = Todo(1, 1, "scc", "", true, OffsetDateTime.now(),
-        OffsetDateTime.now())
+    fun get(userId: Long, id: Long): Todo? {
+        val todo = todoRepository.findById(userId, id)
+        return todo
+    }
 
-    fun delete(userId: Long, id: Long): Boolean = true
+    fun create(newTodo: Todo): Todo {
+        val newId = todoRepository.insert(newTodo.userId, newTodo.title, newTodo.description, newTodo.dueAt, newTodo.completed)
+        return Todo(newId, newTodo.userId, newTodo.title, newTodo.description, newTodo.dueAt, newTodo.completed)
+    }
+
+//    fun update(todo: Todo): Todo? {
+//
+//    }
+
+    fun delete(userId: Long, id: Long) = todoRepository.delete(userId, id)
 }

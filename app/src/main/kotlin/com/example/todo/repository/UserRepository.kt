@@ -19,10 +19,12 @@ class UserRepository(private val db: Database) {
         .where(Tables.Users.ID.eq(id))
         .fetchOne()
 
-    fun create(email: String, passwordHash: String) = dsl
-        .insertInto(Tables.Users.TABLE)
-        .columns(Tables.Users.EMAIL, Tables.Users.PASSWORD_HASH)
-        .values(email, passwordHash)
-        .returningResult(Tables.Users.ID)
-        .fetchOne()!![Tables.Users.ID]
+    fun create(email: String, passwordHash: String): Long {
+        return dsl
+            .insertInto(Tables.Users.TABLE)
+            .columns(Tables.Users.EMAIL, Tables.Users.PASSWORD_HASH)
+            .values(email, passwordHash)
+            .returningResult(Tables.Users.ID)
+            .fetchOne()!!.get(Tables.Users.ID) as Long
+    }
 }

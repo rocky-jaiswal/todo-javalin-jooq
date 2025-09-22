@@ -7,7 +7,6 @@ import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.DefaultConfiguration
-import java.sql.Connection
 import javax.sql.DataSource
 
 class Database() {
@@ -40,7 +39,7 @@ class Database() {
             .set(SQLDialect.POSTGRES)
     }
 
-    fun connection(): Connection = dataSource.connection
+    // fun connection(): Connection = dataSource.connection
 
     fun dsl(): DSLContext = DSL.using(jooqConfiguration)
 

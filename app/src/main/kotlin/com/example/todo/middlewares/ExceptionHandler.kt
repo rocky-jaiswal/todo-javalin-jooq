@@ -2,6 +2,7 @@ package com.example.todo.middlewares
 
 import io.javalin.http.Context
 import io.javalin.http.ExceptionHandler
+import io.javalin.http.HttpResponseException
 import java.time.Instant
 import java.util.Map
 
@@ -14,12 +15,22 @@ object ExceptionHandler {
 
             RequestLogging.logRequestError(ctx, exception, duration)
 
-            ctx.status(500).json(
-                Map.of(
-                    "error", "Internal Server Error",
-                    "timestamp", Instant.now().toString()
+            when (exception) {
+                is HttpResponseException -> ctx.status(exception.status).json(
+                    Map.of(
+                        "error", exception.message ?: "unknown exception",
+                        "timestamp", Instant.now().toString()
+                    )
                 )
-            )
+                else -> ctx.status(500).json(
+                    Map.of(
+                        "error", "Internal Server Error",
+                        "timestamp", Instant.now().toString()
+                    )
+                )
+            }
+
+
         }
     }
 }

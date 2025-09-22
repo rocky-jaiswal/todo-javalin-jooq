@@ -19,7 +19,7 @@ class AuthMiddleware(private val jwt: JWTService) {
 
             val auth = ctx.header("Authorization")
             if (auth == null || !auth.startsWith("Bearer ")) {
-                throw RuntimeException("Bad Authentication header")
+                throw RuntimeException("Bad authentication header")
             }
 
             val jwtClaimSet = jwt.verifyJWT(auth.removePrefix("Bearer ").trim())

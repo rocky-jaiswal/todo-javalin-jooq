@@ -1,4 +1,4 @@
-package com.example.todo
+package com.example.todo.utils
 
 // ==================== RESULT MONAD IN KOTLIN ====================
 
@@ -10,11 +10,11 @@ sealed class Result<out T> {
 
     companion object {
         // Create success result
-        fun <T> success(value: T): Result<T> = Result.Success(value)
+        fun <T> success(value: T): Result<T> = Success(value)
 
         // Create failure result
-        fun failure(error: Throwable): Result<Nothing> = Result.Failure(error)
-        fun failure(message: String): Result<Nothing> = Result.Failure(Exception(message))
+        fun failure(error: Throwable): Result<Nothing> = Failure(error)
+        fun failure(message: String): Result<Nothing> = Failure(Exception(message))
 
         // Wrap a potentially throwing operation
         inline fun <T> runCatching(block: () -> T): Result<T> {
@@ -41,6 +41,12 @@ sealed class Result<out T> {
         is Success -> null
         is Failure -> error
     }
+
+    // Get error or null
+//    fun getOrError(): T = when (this) {
+//        is Success -> value
+//        is Failure -> error
+//    }
 }
 
 // ==================== PART 2: FACTORY FUNCTIONS ====================

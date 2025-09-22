@@ -48,12 +48,11 @@ class Routes(
                 post(todoController::create)
                 path("{id}") {
                     get(todoController::get)
-                    put(todoController::update)
+                    // put(todoController::update)
                     delete(todoController::delete)
                 }
             }
         }
-        // app.exception(ValidationException::class.java) { e, ctx -> todos.handleValidationErrors(e, ctx) }
     }
 }
 

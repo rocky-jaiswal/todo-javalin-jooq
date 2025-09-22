@@ -32,11 +32,9 @@ fi
 # Example logic: run different commands based on input
 if [[ "$COMMAND" == "encrypt" ]]; then
   echo "Running encrypt for environment: $ENVIRONMENT"
-  # Example command
   npx dotenvx encrypt -f app/src/main/resources/.env."$ENVIRONMENT" --stdout > app/src/main/resources/.env."$ENVIRONMENT".enc
 elif [[ "$COMMAND" == "decrypt" ]]; then
   echo "Running decrypt for environment: $ENVIRONMENT"
-  # Example command
   npx dotenvx decrypt -f app/src/main/resources/.env."$ENVIRONMENT".enc --stdout > app/src/main/resources/.env."$ENVIRONMENT"
 else
   echo "Unknown command: $COMMAND"

@@ -76,6 +76,18 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ASYNC_FILE"/>
     </root>
+
+<!--    <Loggers>-->
+<!--        &lt;!&ndash; SQL execution logging is logged to the LoggerListener logger at DEBUG level &ndash;&gt;-->
+<!--        <Logger name="org.jooq.tools.LoggerListener" level="debug">-->
+<!--            <AppenderRef ref="CONSOLE"/>-->
+<!--        </Logger>-->
+
+<!--        &lt;!&ndash; Other jOOQ related debug log output &ndash;&gt;-->
+<!--        <Logger name="org.jooq" level="debug">-->
+<!--            <AppenderRef ref="CONSOLE"/>-->
+<!--        </Logger>-->
+<!--    </Loggers>-->
 </configuration>
 
 <!--<configuration>-->
