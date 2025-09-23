@@ -10,13 +10,13 @@ class AuthController(private val authControllerCommand: AuthCommand) {
 
     fun register(ctx: Context) {
         val body = ctx.bodyValidator<RegisterRequest>().get()
-        authControllerCommand.register(body)
-        ctx.status(201)
+        val userId = authControllerCommand.register(body)
+        ctx.status(201).json(mapOf("userId" to userId))
     }
 
     fun login(ctx: Context) {
         val body = ctx.bodyValidator<LoginRequest>().get()
         val token = authControllerCommand.login(body)
-        ctx.json(mapOf("token" to token))
+        ctx.status(200).json(mapOf("token" to token))
     }
 }

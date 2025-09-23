@@ -4,9 +4,14 @@ import com.example.todo.repository.Tables
 import com.example.todo.repository.UserRepository
 
 class AuthService(private val passwordService: PasswordService, private val userRepository: UserRepository) {
-    fun register(email: String, password: String) {
+    fun userExists(email: String): Long? {
+        val record = userRepository.findByEmail(email)
+        return record?.get(Tables.Users.ID)
+    }
+
+    fun register(email: String, password: String): Long {
         val hash = passwordService.hashPassword(password)
-        userRepository.create(email.lowercase(), hash)
+        return userRepository.create(email.lowercase(), hash) ?: throw RuntimeException("could not create user")
     }
 
     fun verify(email: String, password: String): Long? {

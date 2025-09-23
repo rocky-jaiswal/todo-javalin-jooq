@@ -9,8 +9,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.sql.DriverManager
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class UserRepositoryIntegrationTest : DatabaseTestConfiguration() {
+
+    private val userRepository: UserRepository = UserRepository(Database())
 
     companion object {
         @JvmStatic
@@ -26,7 +29,7 @@ class UserRepositoryIntegrationTest : DatabaseTestConfiguration() {
     }
 
     @Test
-    fun `should save and retrieve user from database`() {
+    fun `should work with the database`() {
         // Your integration test using the migrated database
         val connection = DriverManager.getConnection(
             postgres.jdbcUrl,
@@ -42,12 +45,30 @@ class UserRepositoryIntegrationTest : DatabaseTestConfiguration() {
     }
 
     @Test
-    fun `should handle user queries correctly`() {
-        val userRepository = UserRepository(Database())
+    fun `should save a user`() {
         userRepository.create("test@example.com", "12345678")
 
         val userFromDB = userRepository.findByEmail("test@example.com")
 
         assertThat(userFromDB?.get("email")).isEqualTo("test@example.com")
+    }
+
+    @Test
+    fun `should find a user`() {
+        userRepository.create("test@example.com", "12345678")
+
+        val userFromDB = userRepository.findByEmail("test@example.com")
+
+        val id = userFromDB?.get("id") as Long
+
+        assertThat(userRepository.findById(id)?.get("email")).isEqualTo("test@example.com")
+    }
+
+    @Test
+    fun `should handle duplicate entries`() {
+        val userRepository = UserRepository(Database())
+        userRepository.create("test@example.com", "12345678")
+
+        assertThatThrownBy { userRepository.create("test@example.com", "123456789")  }.isInstanceOf(Exception::class.java)
     }
 }

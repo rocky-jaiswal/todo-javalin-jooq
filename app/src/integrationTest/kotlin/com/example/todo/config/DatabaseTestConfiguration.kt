@@ -15,7 +15,7 @@ abstract class DatabaseTestConfiguration {
             withDatabaseName("todos_test")
             withUsername("app_test")
             withPassword("app_test")
-            // withInitScript("init-test-db.sql") // Optional: initial setup script
+            withReuse(true)
         }
 
         @JvmStatic

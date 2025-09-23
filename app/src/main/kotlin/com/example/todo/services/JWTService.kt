@@ -31,8 +31,8 @@ class JWTService {
 
     companion object {
         private val KEY_PASSWORD = Secrets.KEY_PASSWORD
-        private const val PRIVATE_KEY_FILE = "keys/private_key_encrypted.pem"
-        private const val PUBLIC_KEY_FILE = "keys/public_key.pem"
+        private val PRIVATE_KEY_FILE = Secrets.PRIVATE_KEY_FILE
+        private val PUBLIC_KEY_FILE = Secrets.PUBLIC_KEY_FILE
 
         init {
             // Add BouncyCastle provider for PEM parsing

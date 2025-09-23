@@ -22,7 +22,7 @@ class TodoRepository(private val db: Database) {
         .columns(Tables.Todos.USER_ID, Tables.Todos.TITLE, Tables.Todos.DESCRIPTION, Tables.Todos.DUE_AT,Tables.Todos.COMPLETED)
         .values(userId, title, description, dueAt, completed)
         .returningResult(Tables.Todos.ID)
-        .fetchOne()!![Tables.Todos.ID]
+        .fetchOne()?.get(Tables.Todos.ID)
 
     fun update(userId: Long, id: Long, title: String, description: String?, dueAt: LocalDate, completed: Boolean?) = dsl
         .update(Tables.Todos.TABLE)

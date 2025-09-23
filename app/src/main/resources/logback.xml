@@ -32,76 +32,22 @@
                 "logger": "%logger{36}",
                 "message": "%message",
                 "context": "%X",
-                "service": "${APP_NAME}",
-                "trace_id": "%X{traceId:-}",
-                "span_id": "%X{spanId:-}",
                 "exception": "%ex"
                 }
             </pattern>
         </encoder>
     </appender>
 
-    <!-- File Appender with JSON format -->
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/application.log</file>
+    <!-- SQL execution logging is logged to the LoggerListener logger at DEBUG level -->
+    <Logger name="org.jooq.tools.LoggerListener" level="debug" />
 
-        <!-- Rolling policy -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/application.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>1GB</totalSizeCap>
-        </rollingPolicy>
+    <!-- Other jOOQ related debug log output -->
+    <Logger name="org.jooq" level="debug" />
 
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <includeContext>true</includeContext>
-            <includeMdc>true</includeMdc>
-            <customFields>{"service":"${APP_NAME}"}</customFields>
-        </encoder>
-    </appender>
-
-    <!-- Async Appender for better performance -->
-    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
-        <queueSize>256</queueSize>
-        <discardingThreshold>0</discardingThreshold>
-        <includeCallerData>false</includeCallerData>
-        <appender-ref ref="FILE"/>
-    </appender>
+    <Logger name="org.eclipse.jetty.server" level="INFO"/>
 
     <!-- Root logger -->
     <root level="${LOG_LEVEL}">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="ASYNC_FILE"/>
     </root>
-
-<!--    <Loggers>-->
-<!--        &lt;!&ndash; SQL execution logging is logged to the LoggerListener logger at DEBUG level &ndash;&gt;-->
-<!--        <Logger name="org.jooq.tools.LoggerListener" level="debug">-->
-<!--            <AppenderRef ref="CONSOLE"/>-->
-<!--        </Logger>-->
-
-<!--        &lt;!&ndash; Other jOOQ related debug log output &ndash;&gt;-->
-<!--        <Logger name="org.jooq" level="debug">-->
-<!--            <AppenderRef ref="CONSOLE"/>-->
-<!--        </Logger>-->
-<!--    </Loggers>-->
 </configuration>
-
-<!--<configuration>-->
-<!--    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">-->
-<!--        <encoder>-->
-<!--            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>-->
-<!--        </encoder>-->
-<!--    </appender>-->
-
-<!--    <root level="INFO">-->
-<!--        <appender-ref ref="STDOUT"/>-->
-<!--    </root>-->
-
-<!--    &lt;!&ndash; Reduce Jetty noise &ndash;&gt;-->
-<!--    <logger name="org.eclipse.jetty" level="WARN"/>-->
-<!--    <logger name="org.eclipse.jetty.server" level="INFO"/>-->
-<!--</configuration>-->

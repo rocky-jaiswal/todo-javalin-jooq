@@ -2,11 +2,7 @@ package com.example.todo.commands
 
 import com.example.todo.services.AuthService
 import com.example.todo.services.JWTService
-import com.example.todo.utils.failure
-import com.example.todo.utils.flatMap
-import com.example.todo.utils.getOrThrow
-import com.example.todo.utils.ifSuccess
-import com.example.todo.utils.success
+import com.example.todo.utils.*
 import io.javalin.http.BadRequestResponse
 import io.javalin.http.UnauthorizedResponse
 import io.konform.validation.Invalid
@@ -16,11 +12,11 @@ import io.konform.validation.constraints.minLength
 import io.konform.validation.constraints.notBlank
 import io.konform.validation.constraints.pattern
 
-data class RegisterRequest(val email: String, val password: String)
+data class RegisterRequest(val email: String, val password: String, val passwordConfirmation: String)
 
 data class LoginRequest(val email: String, val password: String)
 
-val userRequestValidator = Validation<RegisterRequest> {
+val userRequestValidator = Validation {
     RegisterRequest::email {
         minLength(1) hint "email cannot be blank"
         pattern(Regex("(.*)@(.*)"))
@@ -28,9 +24,12 @@ val userRequestValidator = Validation<RegisterRequest> {
     RegisterRequest::password {
         minLength(6) hint "password must be 6 characters"
     }
+    RegisterRequest::passwordConfirmation {
+        minLength(6) hint "password must be 6 characters"
+    }
 }
 
-val loginRequestValidator = Validation<LoginRequest> {
+val loginRequestValidator = Validation {
     LoginRequest::email {
         notBlank()
         pattern(Regex("(.*)@(.*)"))
@@ -43,15 +42,29 @@ val loginRequestValidator = Validation<LoginRequest> {
 
 class AuthCommand(private val jwt: JWTService, private val authService: AuthService) {
 
-    fun register(registerRequest: RegisterRequest) {
+    fun register(registerRequest: RegisterRequest): Long? {
         val validationResult = userRequestValidator.validate(registerRequest)
 
-        when(validationResult) {
+        val userId = when(validationResult) {
             is Valid -> success(validationResult.value)
             is Invalid -> failure(BadRequestResponse("bad request"))
-        }.ifSuccess { validRequest ->
-            authService.register(validRequest.email, validRequest.password)
+        }.flatMap { validRequest ->
+            when (validRequest.password == validRequest.passwordConfirmation) {
+                true -> success(validRequest)
+                false -> failure(BadRequestResponse("bad request"))
+            }
+        }.flatMap { validRequest ->
+            val existingUserId = authService.userExists(validRequest.email)
+            if (existingUserId == null) {
+                success(validRequest)
+            } else {
+                failure(BadRequestResponse("bad request"))
+            }
+        }.flatMap { validRequest ->
+            buildResult { tryOperation {  authService.register(validRequest.email, validRequest.password) } }
         }
+
+        return userId.getOrThrow()
     }
 
     fun login(loginRequest: LoginRequest): String {

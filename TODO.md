@@ -14,15 +14,21 @@
 - Code cleanup (app entry ✅, middlewares ✅)
 - Exception handling & reporting (40x vs 50x) ✅
 - Setup in command + Result monad ✅
-- Fix Todo entity CRUD  ✅
-- Unit tests  ✅
-- Integration tests (test containers)
+- Fix Todo entity CRUD ✅
+- Unit tests ✅
+- Log SQL in dev and test ✅
+- Integration tests (test containers with reuse) ✅
+- Test commands with integration tests ✅
+
 - JSON serialization (Date etc.)
 - Java dates (store and send in UTC)
+
 - Good logging (incl. exceptions)
-- Log SQL in dev and test
 - Different loggers for local, test, production
-- Check build
+
 - Lint & editorconfig
 - Gradle cleanup (version lock etc.)
+
 - Docker build (multi-stage) and run
+- Check build
+- Build process / script (lint, format, unit tests, int. tests, build jar etc.)

@@ -20,7 +20,7 @@ object Tables {
         val USER_ID: Field<Long> = DSL.field("user_id", Long::class.java)
         val TITLE: Field<String> = DSL.field("title", String::class.java)
         val DESCRIPTION: Field<String?> = DSL.field("description", String::class.java)
-        val DUE_AT: Field<LocalDate?> = DSL.field("due_by", LocalDate::class.java)
+        val DUE_AT: Field<LocalDate?> = DSL.field("due_at", LocalDate::class.java)
         val COMPLETED: Field<Boolean?> = DSL.field("completed", Boolean::class.java)
     }
 }
