@@ -58,9 +58,6 @@ class JWTService {
         this.verifier = RSASSAVerifier(publicKey)
     }
 
-    /**
-     * Sign a JWT with custom claims
-     */
     // @Throws(Exception::class)
     fun signJWT(
         subject: String?,
@@ -97,9 +94,6 @@ class JWTService {
         return signedJWT.serialize()
     }
 
-    /**
-     * Verify and parse a JWT
-     */
     // @Throws(Exception::class)
     fun verifyJWT(token: String?): JWTClaimsSet {
         val signedJWT: SignedJWT = SignedJWT.parse(token)
@@ -126,9 +120,6 @@ class JWTService {
         return claimsSet
     }
 
-    /**
-     * Load RSA private key from PEM file with passphrase
-     */
     // @Throws(Exception::class)
     private fun loadPrivateKey(
         filePath: String,
@@ -156,9 +147,6 @@ class JWTService {
         }
     }
 
-    /**
-     * Load RSA public key from PEM file
-     */
     // @Throws(Exception::class)
     private fun loadPublicKey(filePath: String): RSAPublicKey {
         FileReader(filePath).use { fileReader ->

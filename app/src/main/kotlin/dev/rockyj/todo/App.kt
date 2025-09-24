@@ -16,7 +16,7 @@ import io.javalin.json.JavalinJackson
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.inject
 import org.koin.logger.slf4jLogger
-import java.util.*
+import java.util.TimeZone
 
 private fun buildApp(
     database: Database,

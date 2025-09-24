@@ -13,7 +13,7 @@ class Database {
     val dataSource: DataSource by lazy {
         val config =
             HikariConfig().apply {
-                jdbcUrl = Secrets.JDBC_URL
+                jdbcUrl = Secrets.JDBC_URL()
                 this.username = Secrets.JDBC_USER
                 this.password = Secrets.JDBC_PASSWORD
                 this.maximumPoolSize = 10

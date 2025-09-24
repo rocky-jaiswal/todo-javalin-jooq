@@ -16,6 +16,7 @@ abstract class DatabaseTestConfiguration {
                 withUsername("app_test")
                 withPassword("app_test")
                 withReuse(true)
+                withUrlParam("TC_DAEMON", "true")
             }
 
         @JvmStatic

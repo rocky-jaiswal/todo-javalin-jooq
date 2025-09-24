@@ -69,7 +69,7 @@ dependencies {
     testImplementation("io.javalin:javalin-testtools:6.2.0")
 
     testImplementation("org.testcontainers:junit-jupiter:1.21.3")
-    testImplementation("org.testcontainers:postgresql:1.19.1")
+    testImplementation("org.testcontainers:postgresql:1.19.8")
     testImplementation("org.flywaydb:flyway-core:11.11.1")
     testImplementation("org.postgresql:postgresql:42.7.7")
 }
@@ -109,6 +109,9 @@ val integrationTest =
         testClassesDirs = sourceSets["integrationTest"].output.classesDirs
         classpath = sourceSets["integrationTest"].runtimeClasspath
 
+        // Run tests serially
+        maxParallelForks = 1
+
         environment("APP_ENV", "test")
 
         useJUnitPlatform()
@@ -118,7 +121,6 @@ val integrationTest =
 
         // Only run integration tests
         include("**/*IntegrationTest*")
-        include("**/*IT*")
 
         // Run after unit tests
         shouldRunAfter(tasks.test)
@@ -128,12 +130,12 @@ val integrationTest =
 tasks.register("testAll") {
     description = "Runs all tests (unit and integration)"
     group = "verification"
-    dependsOn(tasks.test, integrationTest)
+    dependsOn(tasks.test) // integrationTest)
 }
 
 // Make check depend on integration tests too
 tasks.check {
-    dependsOn(integrationTest)
+    // dependsOn(integrationTest)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

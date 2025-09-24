@@ -29,6 +29,6 @@
 - Lint & editorconfig
 - Gradle cleanup (version lock etc.)
 
-- Docker build (multi-stage) and run
 - Check build
-- Build process / script (lint, format, unit tests, int. tests, build jar etc.)
+- Docker build (multi-stage) and run
+- Build script (lint, format, unit tests, int. tests, build jar, docker build & run etc.)
