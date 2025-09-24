@@ -3,7 +3,6 @@ package dev.rockyj.todo.config
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-
 class StructuredLogging {
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(StructuredLogging::class.java)
@@ -16,11 +15,12 @@ class StructuredLogging {
             endpoint: String?,
             method: String?,
             duration: Long?,
-            statusCode: Int?
+            statusCode: Int?,
         ) {
             val lggr = extLogger ?: logger
 
-            lggr.atInfo()
+            lggr
+                .atInfo()
                 .addKeyValue("type", "api_call")
                 .addKeyValue("endpoint", endpoint)
                 .addKeyValue("method", method)
@@ -33,11 +33,12 @@ class StructuredLogging {
             extLogger: Logger?,
             userId: String?,
             action: String?,
-            details: Any
+            details: Any,
         ) {
             val lggr = extLogger ?: logger
 
-            lggr.atInfo()
+            lggr
+                .atInfo()
                 .addKeyValue("type", "user_action")
                 .addKeyValue("user_id", userId)
                 .addKeyValue("action", action)

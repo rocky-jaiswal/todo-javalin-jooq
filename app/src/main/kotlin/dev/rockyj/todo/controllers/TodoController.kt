@@ -5,8 +5,9 @@ import dev.rockyj.todo.commands.TodoCommand
 import io.javalin.http.Context
 import io.javalin.http.bodyValidator
 
-class TodoController(private val todoCommand: TodoCommand) {
-
+class TodoController(
+    private val todoCommand: TodoCommand,
+) {
     fun list(ctx: Context) {
         val userId = ctx.attribute<String>("userId")!!
         ctx.status(200).json(todoCommand.list(userId.toLong()))
@@ -39,10 +40,10 @@ class TodoController(private val todoCommand: TodoCommand) {
     fun delete(ctx: Context) {
         val userId = ctx.attribute<String>("userId")!!
         val id = ctx.pathParamAsClass<Long>("id", Long::class.java).check({ true }, "not null").get()
-        if (todoCommand.delete(userId.toLong(), id) == 1)
+        if (todoCommand.delete(userId.toLong(), id) == 1) {
             ctx.status(204)
-        else
+        } else {
             ctx.status(500)
+        }
     }
-
 }

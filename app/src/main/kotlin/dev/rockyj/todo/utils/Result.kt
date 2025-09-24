@@ -5,8 +5,13 @@ package dev.rockyj.todo.utils
 // ==================== PART 1: CORE RESULT TYPE ====================
 
 sealed class Result<out T> {
-    data class Success<T>(val value: T) : Result<T>()
-    data class Failure(val error: Throwable) : Result<Nothing>()
+    data class Success<T>(
+        val value: T,
+    ) : Result<T>()
+
+    data class Failure(
+        val error: Throwable,
+    ) : Result<Nothing>()
 
     companion object {
         // Create success result
@@ -14,16 +19,16 @@ sealed class Result<out T> {
 
         // Create failure result
         fun failure(error: Throwable): Result<Nothing> = Failure(error)
+
         fun failure(message: String): Result<Nothing> = Failure(Exception(message))
 
         // Wrap a potentially throwing operation
-        inline fun <T> runCatching(block: () -> T): Result<T> {
-            return try {
+        inline fun <T> runCatching(block: () -> T): Result<T> =
+            try {
                 success(block())
             } catch (e: Throwable) {
                 failure(e)
             }
-        }
     }
 
     // Check if result is success/failure
@@ -31,16 +36,18 @@ sealed class Result<out T> {
     val isFailure: Boolean get() = this is Failure
 
     // Get value or null
-    fun getOrNull(): T? = when (this) {
-        is Success -> value
-        is Failure -> null
-    }
+    fun getOrNull(): T? =
+        when (this) {
+            is Success -> value
+            is Failure -> null
+        }
 
     // Get error or null
-    fun errorOrNull(): Throwable? = when (this) {
-        is Success -> null
-        is Failure -> error
-    }
+    fun errorOrNull(): Throwable? =
+        when (this) {
+            is Success -> null
+            is Failure -> error
+        }
 
     // Get error or null
 //    fun getOrError(): T = when (this) {
@@ -56,31 +63,30 @@ fun <T> success(value: T): Result<T> = Result.Success(value)
 
 // Create failure result
 fun failure(error: Throwable): Result<Nothing> = Result.Failure(error)
+
 fun failure(message: String): Result<Nothing> = Result.Failure(Exception(message))
 
 // Wrap a potentially throwing operation
-inline fun <T> runCatching(block: () -> T): Result<T> {
-    return try {
+inline fun <T> runCatching(block: () -> T): Result<T> =
+    try {
         success(block())
     } catch (e: Throwable) {
         failure(e)
     }
-}
 
 // Convert nullable to Result
-fun <T : Any> T?.toResult(errorMessage: String = "Value is null"): Result<T> {
-    return this?.let { success(it) } ?: failure(errorMessage)
-}
+fun <T : Any> T?.toResult(errorMessage: String = "Value is null"): Result<T> =
+    this?.let { success(it) } ?: failure(errorMessage)
 
 // Convert boolean to Result
-fun Boolean.toResult(errorMessage: String = "Condition failed"): Result<Unit> {
-    return if (this) success(Unit) else failure(errorMessage)
-}
+fun Boolean.toResult(errorMessage: String = "Condition failed"): Result<Unit> =
+    if (this) success(Unit) else failure(errorMessage)
 
 // Convert with success value if condition is true
-fun <T> Boolean.toResult(value: T, errorMessage: String = "Condition failed"): Result<T> {
-    return if (this) success(value) else failure(errorMessage)
-}
+fun <T> Boolean.toResult(
+    value: T,
+    errorMessage: String = "Condition failed",
+): Result<T> = if (this) success(value) else failure(errorMessage)
 
 // Convert any value to success
 fun <T> T.toSuccess(): Result<T> = success(this)
@@ -91,20 +97,18 @@ fun Throwable.toFailure(): Result<Nothing> = failure(this)
 // ==================== PART 3: CORE MONAD OPERATIONS ====================
 
 // MAP: Transform success value, keep failure as-is
-inline fun <T, R> Result<T>.map(transform: (T) -> R): Result<R> {
-    return when (this) {
+inline fun <T, R> Result<T>.map(transform: (T) -> R): Result<R> =
+    when (this) {
         is Result.Success -> success(transform(value))
         is Result.Failure -> this
     }
-}
 
 // FLAT MAP: Transform success value to another Result, flatten nested Results
-inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
-    return when (this) {
+inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> =
+    when (this) {
         is Result.Success -> transform(value)
         is Result.Failure -> this
     }
-}
 
 // INFIX version of flatMap for better chaining
 inline infix fun <T, R> Result<T>.then(transform: (T) -> Result<R>): Result<R> = flatMap(transform)
@@ -112,28 +116,25 @@ inline infix fun <T, R> Result<T>.then(transform: (T) -> Result<R>): Result<R> =
 // ==================== PART 4: ERROR HANDLING ====================
 
 // Map errors to different types
-inline fun <T> Result<T>.mapError(transform: (Throwable) -> Throwable): Result<T> {
-    return when (this) {
+inline fun <T> Result<T>.mapError(transform: (Throwable) -> Throwable): Result<T> =
+    when (this) {
         is Result.Success -> this
         is Result.Failure -> failure(transform(error))
     }
-}
 
 // Recover from failure with a default value
-inline fun <T> Result<T>.recover(recovery: (Throwable) -> T): Result<T> {
-    return when (this) {
+inline fun <T> Result<T>.recover(recovery: (Throwable) -> T): Result<T> =
+    when (this) {
         is Result.Success -> this
         is Result.Failure -> success(recovery(error))
     }
-}
 
 // Recover from failure with another Result
-inline fun <T> Result<T>.recoverWith(recovery: (Throwable) -> Result<T>): Result<T> {
-    return when (this) {
+inline fun <T> Result<T>.recoverWith(recovery: (Throwable) -> Result<T>): Result<T> =
+    when (this) {
         is Result.Success -> this
         is Result.Failure -> recovery(error)
     }
-}
 
 // ==================== PART 5: INFIX OPERATIONS FOR CHAINING ====================
 
@@ -141,12 +142,11 @@ inline fun <T> Result<T>.recoverWith(recovery: (Throwable) -> Result<T>): Result
 inline infix fun <T, R> Result<T>.mapTo(transform: (T) -> R): Result<R> = map(transform)
 
 // Infix version of recover
-infix fun <T> Result<T>.orElse(defaultValue: T): T {
-    return when (this) {
+infix fun <T> Result<T>.orElse(defaultValue: T): T =
+    when (this) {
         is Result.Success -> value
         is Result.Failure -> defaultValue
     }
-}
 
 // Infix version of recoverWith
 inline infix fun <T> Result<T>.orTry(recovery: (Throwable) -> Result<T>): Result<T> = recoverWith(recovery)
@@ -167,6 +167,7 @@ inline fun <T> Result<T>.onFailure(action: (Throwable) -> Unit): Result<T> {
 
 // Infix versions for natural language
 inline infix fun <T> Result<T>.ifSuccess(action: (T) -> Unit): Result<T> = onSuccess(action)
+
 inline infix fun <T> Result<T>.ifFailure(action: (Throwable) -> Unit): Result<T> = onFailure(action)
 
 // ==================== PART 7: FOLD AND TERMINAL OPERATIONS ====================
@@ -174,29 +175,26 @@ inline infix fun <T> Result<T>.ifFailure(action: (Throwable) -> Unit): Result<T>
 // Fold: Handle both success and failure cases
 inline fun <T, R> Result<T>.fold(
     onSuccess: (T) -> R,
-    onFailure: (Throwable) -> R
-): R {
-    return when (this) {
+    onFailure: (Throwable) -> R,
+): R =
+    when (this) {
         is Result.Success -> onSuccess(value)
         is Result.Failure -> onFailure(error)
     }
-}
 
 // Get value or throw exception
-fun <T> Result<T>.getOrThrow(): T {
-    return when (this) {
+fun <T> Result<T>.getOrThrow(): T =
+    when (this) {
         is Result.Success -> value
         is Result.Failure -> throw error
     }
-}
 
 // Get value or return default
-fun <T> Result<T>.getOrDefault(default: T): T {
-    return when (this) {
+fun <T> Result<T>.getOrDefault(default: T): T =
+    when (this) {
         is Result.Success -> value
         is Result.Failure -> default
     }
-}
 
 // ==================== PART 8: COLLECTION OPERATIONS ====================
 
@@ -213,9 +211,7 @@ fun <T> List<Result<T>>.sequence(): Result<List<T>> {
 }
 
 // Transform list with a function that returns Result
-inline fun <T, R> List<T>.mapResult(transform: (T) -> Result<R>): Result<List<R>> {
-    return map(transform).sequence()
-}
+inline fun <T, R> List<T>.mapResult(transform: (T) -> Result<R>): Result<List<R>> = map(transform).sequence()
 
 // ==================== PART 9: DSL FOR RESULT BUILDING ====================
 
@@ -241,64 +237,78 @@ class ResultBuilder<T> {
     fun build(): Result<T> = result ?: failure("No operation specified")
 }
 
-fun <T> buildResult(init: ResultBuilder<T>.() -> Unit): Result<T> {
-    return ResultBuilder<T>().apply(init).build()
-}
+fun <T> buildResult(init: ResultBuilder<T>.() -> Unit): Result<T> = ResultBuilder<T>().apply(init).build()
 
 // ==================== PART 10: PRACTICAL EXAMPLES ====================
 
 // Example domain objects
-data class User(val id: Int, val email: String, val name: String)
-data class Profile(val userId: Int, val bio: String, val avatarUrl: String)
-data class UserWithProfile(val user: User, val profile: Profile)
+data class User(
+    val id: Int,
+    val email: String,
+    val name: String,
+)
+
+data class Profile(
+    val userId: Int,
+    val bio: String,
+    val avatarUrl: String,
+)
+
+data class UserWithProfile(
+    val user: User,
+    val profile: Profile,
+)
 
 // Simulated service functions that can fail
 object UserService {
-    private val users = mapOf(
-        1 to User(1, "john@example.com", "John Doe"),
-        2 to User(2, "jane@example.com", "Jane Smith")
-    )
+    private val users =
+        mapOf(
+            1 to User(1, "john@example.com", "John Doe"),
+            2 to User(2, "jane@example.com", "Jane Smith"),
+        )
 
-    fun findUser(id: Int): Result<User> {
-        return users[id]?.let { success(it) }
+    fun findUser(id: Int): Result<User> =
+        users[id]?.let { success(it) }
             ?: failure("User not found: $id")
-    }
 
-    fun validateEmail(email: String): Result<String> {
-        return if (email.contains("@") && email.contains(".")) {
+    fun validateEmail(email: String): Result<String> =
+        if (email.contains("@") && email.contains(".")) {
             success(email)
         } else {
             failure("Invalid email format: $email")
         }
-    }
 
-    fun updateUserName(user: User, newName: String): Result<User> {
-        return if (newName.isNotBlank()) {
+    fun updateUserName(
+        user: User,
+        newName: String,
+    ): Result<User> =
+        if (newName.isNotBlank()) {
             success(user.copy(name = newName))
         } else {
             failure("Name cannot be blank")
         }
-    }
 }
 
 object ProfileService {
-    private val profiles = mapOf(
-        1 to Profile(1, "Software developer", "avatar1.jpg"),
-        2 to Profile(2, "Designer", "avatar2.jpg")
-    )
+    private val profiles =
+        mapOf(
+            1 to Profile(1, "Software developer", "avatar1.jpg"),
+            2 to Profile(2, "Designer", "avatar2.jpg"),
+        )
 
-    fun findProfile(userId: Int): Result<Profile> {
-        return profiles[userId]?.let { success(it) }
+    fun findProfile(userId: Int): Result<Profile> =
+        profiles[userId]?.let { success(it) }
             ?: failure("Profile not found for user: $userId")
-    }
 
-    fun createProfile(userId: Int, bio: String): Result<Profile> {
-        return if (bio.length >= 10) {
+    fun createProfile(
+        userId: Int,
+        bio: String,
+    ): Result<Profile> =
+        if (bio.length >= 10) {
             success(Profile(userId, bio, "default.jpg"))
         } else {
             failure("Bio must be at least 10 characters")
         }
-    }
 }
 
 // ==================== PART 11: DEMONSTRATION ====================
@@ -307,26 +317,29 @@ fun demonstrateBasicChaining() {
     println("=== Basic Result Chaining ===")
 
     // Simple success chain
-    val result1 = success(5)
-        .map { it * 2 }
-        .map { it + 3 }
-        .map { "Result: $it" }
+    val result1 =
+        success(5)
+            .map { it * 2 }
+            .map { it + 3 }
+            .map { "Result: $it" }
 
     println("Success chain: ${result1.getOrNull()}")
 
     // Chain that fails
-    val result2 = success(10)
-        .map { it / 2 }
-        .flatMap { if (it > 3) success(it) else failure("Too small") }
-        .map { "Final: $it" }
+    val result2 =
+        success(10)
+            .map { it / 2 }
+            .flatMap { if (it > 3) success(it) else failure("Too small") }
+            .map { "Final: $it" }
 
     println("Success result: ${result2.getOrNull()}")
 
     // Chain that fails early
-    val result3 = success(2)
-        .map { it / 2 }
-        .flatMap { if (it > 3) success(it) else failure("Too small") }
-        .map { "Final: $it" }  // This won't execute
+    val result3 =
+        success(2)
+            .map { it / 2 }
+            .flatMap { if (it > 3) success(it) else failure("Too small") }
+            .map { "Final: $it" } // This won't execute
 
     println("Failed result: ${result3.errorOrNull()?.message}")
 }
@@ -336,11 +349,13 @@ fun demonstrateInfixChaining() {
 
     val userId = 1
 
-    val result = UserService.findUser(userId)
-        .then { user -> UserService.validateEmail(user.email) mapTo { user } }
-        .then { user -> ProfileService.findProfile(user.id) mapTo { profile -> UserWithProfile(user, profile) } }
-        .ifSuccess { println("Found user with profile: ${it.user.name}") }
-        .ifFailure { println("Error: ${it.message}") }
+    val result =
+        UserService
+            .findUser(userId)
+            .then { user -> UserService.validateEmail(user.email) mapTo { user } }
+            .then { user -> ProfileService.findProfile(user.id) mapTo { profile -> UserWithProfile(user, profile) } }
+            .ifSuccess { println("Found user with profile: ${it.user.name}") }
+            .ifFailure { println("Error: ${it.message}") }
 
     println("Result: ${result.fold({ "Success" }, { "Failed: ${it.message}" })}")
 }
@@ -348,18 +363,21 @@ fun demonstrateInfixChaining() {
 fun demonstrateErrorHandling() {
     println("=== Error Handling ===")
 
-    val result1 = UserService.findUser(999) // Will fail
-        .recover { failure -> User(-1, "unknown@example.com", "Unknown User") }
-        .map { "User: ${it.name}" }
+    val result1 =
+        UserService
+            .findUser(999) // Will fail
+            .recover { failure -> User(-1, "unknown@example.com", "Unknown User") }
+            .map { "User: ${it.name}" }
 
     println("Recovered result: ${result1.getOrNull()}")
 
-    val result2 = UserService.findUser(999) // Will fail
-        .orTry { failure ->
-            println("First attempt failed: ${failure.message}")
-            UserService.findUser(1) // Try with different ID
-        }
-        .map { "Found user: ${it.name}" }
+    val result2 =
+        UserService
+            .findUser(999) // Will fail
+            .orTry { failure ->
+                println("First attempt failed: ${failure.message}")
+                UserService.findUser(1) // Try with different ID
+            }.map { "Found user: ${it.name}" }
 
     println("Recovery result: ${result2.getOrNull()}")
 
@@ -377,9 +395,10 @@ fun demonstrateCollectionOperations() {
     println("All users result: ${allUsersResult.fold({ "Success: ${it.size} users" }, { "Failed: ${it.message}" })}")
 
     // Get only successful results
-    val validUsers = userIds
-        .map { UserService.findUser(it) }
-        .mapNotNull { it.getOrNull() }
+    val validUsers =
+        userIds
+            .map { UserService.findUser(it) }
+            .mapNotNull { it.getOrNull() }
 
     println("Valid users: ${validUsers.map { it.name }}")
 }
@@ -387,15 +406,19 @@ fun demonstrateCollectionOperations() {
 fun demonstrateResultBuilder() {
     println("=== Result Builder DSL ===")
 
-    val result = buildResult {
-        tryOperation { "Hello" }
-        thenMap { "$it World" }
-        thenMap { it.uppercase() }
-        thenFlatMap {
-            if (it.length > 5) success(it)
-            else failure("Too short")
+    val result =
+        buildResult {
+            tryOperation { "Hello" }
+            thenMap { "$it World" }
+            thenMap { it.uppercase() }
+            thenFlatMap {
+                if (it.length > 5) {
+                    success(it)
+                } else {
+                    failure("Too short")
+                }
+            }
         }
-    }
 
     println("Builder result: ${result.getOrNull()}")
 }
@@ -403,20 +426,23 @@ fun demonstrateResultBuilder() {
 fun demonstrateComplexChain() {
     println("=== Complex Real-World Chain ===")
 
-    fun processUser(userId: Int, newName: String, newBio: String): Result<String> {
-        return UserService.findUser(userId)
+    fun processUser(
+        userId: Int,
+        newName: String,
+        newBio: String,
+    ): Result<String> =
+        UserService
+            .findUser(userId)
             .then { user -> UserService.updateUserName(user, newName) }
             .then { updatedUser ->
-                ProfileService.findProfile(updatedUser.id)
+                ProfileService
+                    .findProfile(updatedUser.id)
                     .orTry { ProfileService.createProfile(updatedUser.id, newBio) }
                     .mapTo { profile -> UserWithProfile(updatedUser, profile) }
-            }
-            .mapTo { userWithProfile ->
+            }.mapTo { userWithProfile ->
                 "Successfully processed ${userWithProfile.user.name} with bio: ${userWithProfile.profile.bio}"
-            }
-            .ifSuccess { println("✓ $it") }
+            }.ifSuccess { println("✓ $it") }
             .ifFailure { println("✗ Error: ${it.message}") }
-    }
 
     // Success case
     processUser(1, "John Updated", "I am a software developer with 5 years experience")
@@ -432,16 +458,22 @@ fun demonstrateComplexChain() {
 
 // Result with context (like Either with Left/Right but more specific)
 sealed class ResultWithContext<out T, out C> {
-    data class Success<T, C>(val value: T, val context: C) : ResultWithContext<T, C>()
-    data class Failure<C>(val error: Throwable, val context: C) : ResultWithContext<Nothing, C>()
+    data class Success<T, C>(
+        val value: T,
+        val context: C,
+    ) : ResultWithContext<T, C>()
+
+    data class Failure<C>(
+        val error: Throwable,
+        val context: C,
+    ) : ResultWithContext<Nothing, C>()
 }
 
 // Parallel execution (simplified - would use coroutines in real code)
-fun <T1, T2> Result<T1>.zip(other: Result<T2>): Result<Pair<T1, T2>> {
-    return this.flatMap { value1 ->
+fun <T1, T2> Result<T1>.zip(other: Result<T2>): Result<Pair<T1, T2>> =
+    this.flatMap { value1 ->
         other.map { value2 -> Pair(value1, value2) }
     }
-}
 
 fun demonstrateAdvancedPatterns() {
     println("=== Advanced Patterns ===")
@@ -450,18 +482,21 @@ fun demonstrateAdvancedPatterns() {
     val user = UserService.findUser(1)
     val profile = ProfileService.findProfile(1)
 
-    val combined = user.zip(profile)
-        .map { (u, p) -> UserWithProfile(u, p) }
-        .map { "Combined: ${it.user.name} - ${it.profile.bio}" }
+    val combined =
+        user
+            .zip(profile)
+            .map { (u, p) -> UserWithProfile(u, p) }
+            .map { "Combined: ${it.user.name} - ${it.profile.bio}" }
 
     println("Combined result: ${combined.getOrNull()}")
 
     // Pipeline with multiple validations
-    val pipeline = success("john.doe@example.com")
-        .flatMap { UserService.validateEmail(it) }
-        .map { email -> User(100, email, "John Doe") }
-        .flatMap { user -> UserService.updateUserName(user, "Updated John") }
-        .map { "Pipeline result: ${it.name}" }
+    val pipeline =
+        success("john.doe@example.com")
+            .flatMap { UserService.validateEmail(it) }
+            .map { email -> User(100, email, "John Doe") }
+            .flatMap { user -> UserService.updateUserName(user, "Updated John") }
+            .map { "Pipeline result: ${it.name}" }
 
     println("Pipeline: ${pipeline.getOrNull()}")
 }

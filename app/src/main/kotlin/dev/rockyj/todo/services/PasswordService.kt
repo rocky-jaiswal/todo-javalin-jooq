@@ -13,18 +13,17 @@ import kotlin.experimental.xor
  * Falls back to PBKDF2 with SHA-512 if Argon2 is not available
  */
 class PasswordService {
-
     companion object {
         // Argon2id parameters (OWASP recommended for 2024)
         private const val ARGON2_SALT_LENGTH = 16
         private const val ARGON2_HASH_LENGTH = 32
-        private const val ARGON2_ITERATIONS = 3      // Number of iterations
-        private const val ARGON2_MEMORY = 65536      // Memory usage in KiB (64 MB)
-        private const val ARGON2_PARALLELISM = 4     // Number of threads
+        private const val ARGON2_ITERATIONS = 3 // Number of iterations
+        private const val ARGON2_MEMORY = 65536 // Memory usage in KiB (64 MB)
+        private const val ARGON2_PARALLELISM = 4 // Number of threads
 
         // PBKDF2 parameters (fallback)
         private const val PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA512"
-        private const val PBKDF2_ITERATIONS = 600000  // OWASP recommendation for 2024
+        private const val PBKDF2_ITERATIONS = 600000 // OWASP recommendation for 2024
         private const val PBKDF2_SALT_LENGTH = 32
         private const val PBKDF2_HASH_LENGTH = 64
 
@@ -38,36 +37,36 @@ class PasswordService {
     /**
      * Hash a password using Argon2id (preferred) or PBKDF2-SHA512 (fallback)
      */
-    fun hashPassword(password: String): String {
-        return try {
+    fun hashPassword(password: String): String =
+        try {
             hashWithArgon2(password)
         } catch (e: Exception) {
             // Fall back to PBKDF2 if Argon2 is not available
             hashWithPBKDF2(password)
         }
-    }
 
     /**
      * Verify a password against its hash
      */
-    fun verifyPassword(password: String, hash: String): Boolean {
-        return when {
+    fun verifyPassword(
+        password: String,
+        hash: String,
+    ): Boolean =
+        when {
             hash.startsWith(ARGON2_PREFIX) -> verifyArgon2(password, hash)
             hash.startsWith(PBKDF2_PREFIX) -> verifyPBKDF2(password, hash)
             else -> throw IllegalArgumentException("Unknown hash format")
         }
-    }
 
     /**
      * Check if a password hash needs to be upgraded (rehashed with better parameters)
      */
-    fun needsRehash(hash: String): Boolean {
-        return when {
+    fun needsRehash(hash: String): Boolean =
+        when {
             hash.startsWith(ARGON2_PREFIX) -> checkArgon2NeedsRehash(hash)
             hash.startsWith(PBKDF2_PREFIX) -> true // Always upgrade PBKDF2 to Argon2
             else -> true
         }
-    }
 
     /**
      * Hash password using Argon2id
@@ -76,13 +75,15 @@ class PasswordService {
         val salt = ByteArray(ARGON2_SALT_LENGTH)
         secureRandom.nextBytes(salt)
 
-        val params = Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
-            .withVersion(Argon2Parameters.ARGON2_VERSION_13)
-            .withIterations(ARGON2_ITERATIONS)
-            .withMemoryAsKB(ARGON2_MEMORY)
-            .withParallelism(ARGON2_PARALLELISM)
-            .withSalt(salt)
-            .build()
+        val params =
+            Argon2Parameters
+                .Builder(Argon2Parameters.ARGON2_id)
+                .withVersion(Argon2Parameters.ARGON2_VERSION_13)
+                .withIterations(ARGON2_ITERATIONS)
+                .withMemoryAsKB(ARGON2_MEMORY)
+                .withParallelism(ARGON2_PARALLELISM)
+                .withSalt(salt)
+                .build()
 
         val generator = Argon2BytesGenerator()
         generator.init(params)
@@ -95,16 +96,19 @@ class PasswordService {
         val hashBase64 = Base64.getEncoder().withoutPadding().encodeToString(hash)
 
         return ARGON2_PREFIX +
-                "v=${Argon2Parameters.ARGON2_VERSION_13}\$" +
-                "m=$ARGON2_MEMORY,t=$ARGON2_ITERATIONS,p=$ARGON2_PARALLELISM\$" +
-                "$saltBase64\$" +
-                hashBase64
+            "v=${Argon2Parameters.ARGON2_VERSION_13}\$" +
+            "m=$ARGON2_MEMORY,t=$ARGON2_ITERATIONS,p=$ARGON2_PARALLELISM\$" +
+            "$saltBase64\$" +
+            hashBase64
     }
 
     /**
      * Verify password using Argon2id
      */
-    private fun verifyArgon2(password: String, hash: String): Boolean {
+    private fun verifyArgon2(
+        password: String,
+        hash: String,
+    ): Boolean {
         try {
             val parts = hash.split('$')
             if (parts.size != 6) return false
@@ -119,13 +123,15 @@ class PasswordService {
             val salt = Base64.getDecoder().decode(parts[4])
             val expectedHash = Base64.getDecoder().decode(parts[5])
 
-            val params = Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
-                .withVersion(version)
-                .withIterations(iterations)
-                .withMemoryAsKB(memory)
-                .withParallelism(parallelism)
-                .withSalt(salt)
-                .build()
+            val params =
+                Argon2Parameters
+                    .Builder(Argon2Parameters.ARGON2_id)
+                    .withVersion(version)
+                    .withIterations(iterations)
+                    .withMemoryAsKB(memory)
+                    .withParallelism(parallelism)
+                    .withSalt(salt)
+                    .build()
 
             val generator = Argon2BytesGenerator()
             generator.init(params)
@@ -153,8 +159,8 @@ class PasswordService {
             val parallelism = paramParts[2].substring(2).toInt()
 
             return memory < ARGON2_MEMORY ||
-                    iterations < ARGON2_ITERATIONS ||
-                    parallelism < ARGON2_PARALLELISM
+                iterations < ARGON2_ITERATIONS ||
+                parallelism < ARGON2_PARALLELISM
         } catch (e: Exception) {
             return true
         }
@@ -182,7 +188,10 @@ class PasswordService {
     /**
      * Verify password using PBKDF2
      */
-    private fun verifyPBKDF2(password: String, hash: String): Boolean {
+    private fun verifyPBKDF2(
+        password: String,
+        hash: String,
+    ): Boolean {
         try {
             val parts = hash.split('$')
             if (parts.size != 5) return false
@@ -206,7 +215,10 @@ class PasswordService {
     /**
      * Constant-time comparison to prevent timing attacks
      */
-    private fun constantTimeEquals(a: ByteArray, b: ByteArray): Boolean {
+    private fun constantTimeEquals(
+        a: ByteArray,
+        b: ByteArray,
+    ): Boolean {
         if (a.size != b.size) return false
 
         var result: Byte = 0

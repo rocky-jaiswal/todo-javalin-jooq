@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class TodoRepositoryIntegrationTest : DatabaseTestConfiguration() {
-
     private val db = Database()
     private val userRepository: UserRepository = UserRepository(db)
     private val todoRepository = TodoRepository(db)
@@ -92,5 +91,4 @@ class TodoRepositoryIntegrationTest : DatabaseTestConfiguration() {
 
         assertThat(todoRepository.findAllForUserId(userId).size).isEqualTo(2)
     }
-
 }

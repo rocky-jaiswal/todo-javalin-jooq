@@ -18,32 +18,37 @@ import org.koin.java.KoinJavaComponent.inject
 import org.koin.logger.slf4jLogger
 import java.util.*
 
-private fun buildApp(database: Database, routes: Routes): Javalin {
+private fun buildApp(
+    database: Database,
+    routes: Routes,
+): Javalin {
+    val app =
+        Javalin.create { config ->
+            config.useVirtualThreads = true
+            config.http.asyncTimeout = 10_000L
+            config.jsonMapper(
+                JavalinJackson().updateMapper { mapper ->
+                    mapper.registerModule(JavaTimeModule()).setTimeZone(TimeZone.getTimeZone("UTC"))
+                    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                    mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+                },
+            )
+            config.http.defaultContentType = "application/json"
+            config.showJavalinBanner = false
 
-    val app = Javalin.create { config ->
-        config.useVirtualThreads = true
-        config.http.asyncTimeout = 10_000L
-        config.jsonMapper(JavalinJackson().updateMapper { mapper ->
-            mapper.registerModule(JavaTimeModule()).setTimeZone(TimeZone.getTimeZone("UTC"))
-            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-        })
-        config.http.defaultContentType = "application/json"
-        config.showJavalinBanner = false
+            // Flyway
+            config.registerPlugin(Flyway(database))
 
-        // Flyway
-        config.registerPlugin(Flyway(database))
-
-        // Enable CORS
-        config.bundledPlugins.enableCors { cors ->
-            cors.addRule {
-                // it.allowHost("example.com", "javalin.io")
-                it.anyHost()
+            // Enable CORS
+            config.bundledPlugins.enableCors { cors ->
+                cors.addRule {
+                    // it.allowHost("example.com", "javalin.io")
+                    it.anyHost()
+                }
             }
-        }
 
-        routes.registerRoutes(config)
-    }
+            routes.registerRoutes(config)
+        }
 
     return app
 }
@@ -54,9 +59,9 @@ fun main() {
         modules(appModule)
     }
 
-    val db : Database by inject(Database::class.java)
-    val routes : Routes by inject(Routes::class.java)
-    val authMiddleware : AuthMiddleware by inject(AuthMiddleware::class.java)
+    val db: Database by inject(Database::class.java)
+    val routes: Routes by inject(Routes::class.java)
+    val authMiddleware: AuthMiddleware by inject(AuthMiddleware::class.java)
 
     val app = buildApp(db, routes)
 
@@ -68,4 +73,3 @@ fun main() {
 
     app.start(Secrets.APP_PORT)
 }
-

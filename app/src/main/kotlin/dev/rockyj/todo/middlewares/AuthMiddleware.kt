@@ -6,14 +6,16 @@ import io.javalin.http.UnauthorizedResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class AuthMiddleware(private val jwt: JWTService) {
-
+class AuthMiddleware(
+    private val jwt: JWTService,
+) {
     private val logger: Logger = LoggerFactory.getLogger(AuthMiddleware::class.java)
 
     fun authenticate(ctx: Context) {
         try {
             if (ctx.path().startsWith("/api/public") ||
-                ctx.path().startsWith("/api/auth")) {
+                ctx.path().startsWith("/api/auth")
+            ) {
                 return
             }
 
@@ -25,10 +27,9 @@ class AuthMiddleware(private val jwt: JWTService) {
             val jwtClaimSet = jwt.verifyJWT(auth.removePrefix("Bearer ").trim())
 
             ctx.attribute("userId", jwtClaimSet.subject)
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             logger.error("Error in auth middleware", ex)
             throw UnauthorizedResponse("unauthorized access")
         }
     }
-
 }

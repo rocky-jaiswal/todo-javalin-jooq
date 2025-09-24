@@ -7,20 +7,21 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 @Testcontainers
 abstract class DatabaseTestConfiguration {
-
     companion object {
         @Container
         @JvmStatic
-        val postgres: PostgreSQLContainer<Nothing> = PostgreSQLContainer<Nothing>("postgres:17-alpine").apply {
-            withDatabaseName("todos_test")
-            withUsername("app_test")
-            withPassword("app_test")
-            withReuse(true)
-        }
+        val postgres: PostgreSQLContainer<Nothing> =
+            PostgreSQLContainer<Nothing>("postgres:17-alpine").apply {
+                withDatabaseName("todos_test")
+                withUsername("app_test")
+                withPassword("app_test")
+                withReuse(true)
+            }
 
         @JvmStatic
         val flyway: Flyway by lazy {
-            Flyway.configure()
+            Flyway
+                .configure()
                 .dataSource(postgres.jdbcUrl, postgres.username, postgres.password)
                 .locations("classpath:db/migrations")
                 .cleanDisabled(false)

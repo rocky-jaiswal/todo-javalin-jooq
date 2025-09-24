@@ -10,5 +10,5 @@ data class Todo(
     val dueAt: LocalDate?,
     val completed: Boolean?,
     val createdAt: java.time.OffsetDateTime? = null,
-    val updatedAt: java.time.OffsetDateTime? = null
+    val updatedAt: java.time.OffsetDateTime? = null,
 )

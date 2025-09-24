@@ -7,30 +7,32 @@ import java.time.Instant
 import java.util.Map
 
 object ExceptionHandler {
-
-    fun exceptionHandler(): io.javalin.http.ExceptionHandler<Exception> {
-        return ExceptionHandler { exception: Exception, ctx: Context? ->
+    fun exceptionHandler(): io.javalin.http.ExceptionHandler<Exception> =
+        ExceptionHandler { exception: Exception, ctx: Context? ->
             val startTime = ctx!!.attribute<Long?>("request_start_time")
             val duration = if (startTime != null) System.currentTimeMillis() - startTime else 0
 
             RequestLogging.logRequestError(ctx, exception, duration)
 
             when (exception) {
-                is HttpResponseException -> ctx.status(exception.status).json(
-                    Map.of(
-                        "error", exception.message ?: "unknown exception",
-                        "timestamp", Instant.now().toString()
+                is HttpResponseException ->
+                    ctx.status(exception.status).json(
+                        Map.of(
+                            "error",
+                            exception.message ?: "unknown exception",
+                            "timestamp",
+                            Instant.now().toString(),
+                        ),
                     )
-                )
-                else -> ctx.status(500).json(
-                    Map.of(
-                        "error", "Internal Server Error",
-                        "timestamp", Instant.now().toString()
+                else ->
+                    ctx.status(500).json(
+                        Map.of(
+                            "error",
+                            "Internal Server Error",
+                            "timestamp",
+                            Instant.now().toString(),
+                        ),
                     )
-                )
             }
-
-
         }
-    }
 }

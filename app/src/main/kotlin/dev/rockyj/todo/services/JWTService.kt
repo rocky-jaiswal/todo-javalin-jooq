@@ -1,12 +1,12 @@
 package dev.rockyj.todo.services
 
-import dev.rockyj.todo.config.Secrets
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.crypto.RSASSAVerifier
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
+import dev.rockyj.todo.config.Secrets
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.PEMParser
@@ -41,11 +41,13 @@ class JWTService {
     }
 
     init {
-        val privateKeyResource = Thread.currentThread().contextClassLoader.getResource(PRIVATE_KEY_FILE)
-            ?: throw IllegalArgumentException("File not found!")
+        val privateKeyResource =
+            Thread.currentThread().contextClassLoader.getResource(PRIVATE_KEY_FILE)
+                ?: throw IllegalArgumentException("File not found!")
 
-        val pubKeyResource = Thread.currentThread().contextClassLoader.getResource(PUBLIC_KEY_FILE)
-            ?: throw IllegalArgumentException("File not found!")
+        val pubKeyResource =
+            Thread.currentThread().contextClassLoader.getResource(PUBLIC_KEY_FILE)
+                ?: throw IllegalArgumentException("File not found!")
 
         // Load keys from files
         val privateKey = loadPrivateKey(privateKeyResource.path, KEY_PASSWORD)
@@ -61,22 +63,25 @@ class JWTService {
      */
     // @Throws(Exception::class)
     fun signJWT(
-        subject: String?, audience: String?, expirationMinutes: Long, customClaims: MutableMap<String?, Any?>?
+        subject: String?,
+        audience: String?,
+        expirationMinutes: Long,
+        customClaims: MutableMap<String?, Any?>?,
     ): String {
         val now = Instant.now()
         val expiration = now.plus(expirationMinutes, ChronoUnit.MINUTES)
 
-
         // Create JWT claims
-        val claimsBuilder = JWTClaimsSet.Builder()
-            .subject(subject)
-            .issuer("dev.rockyj")
-            .audience(audience)
-            .expirationTime(Date.from(expiration))
-            .notBeforeTime(Date.from(now))
-            .issueTime(Date.from(now))
-            .jwtID(UUID.randomUUID().toString())
-
+        val claimsBuilder =
+            JWTClaimsSet
+                .Builder()
+                .subject(subject)
+                .issuer("dev.rockyj")
+                .audience(audience)
+                .expirationTime(Date.from(expiration))
+                .notBeforeTime(Date.from(now))
+                .issueTime(Date.from(now))
+                .jwtID(UUID.randomUUID().toString())
 
         // Add custom claims
         customClaims?.forEach(claimsBuilder::claim)
@@ -125,14 +130,18 @@ class JWTService {
      * Load RSA private key from PEM file with passphrase
      */
     // @Throws(Exception::class)
-    private fun loadPrivateKey(filePath: String, passphrase: String): RSAPrivateKey {
+    private fun loadPrivateKey(
+        filePath: String,
+        passphrase: String,
+    ): RSAPrivateKey {
         FileReader(filePath).use { fileReader ->
             PEMParser(fileReader).use { pemParser ->
                 val pemObject = pemParser.readObject() as PKCS8EncryptedPrivateKeyInfo
 
-                val decryptorProvider = JceOpenSSLPKCS8DecryptorProviderBuilder()
-                    .setProvider("BC")
-                    .build(passphrase.toCharArray())
+                val decryptorProvider =
+                    JceOpenSSLPKCS8DecryptorProviderBuilder()
+                        .setProvider("BC")
+                        .build(passphrase.toCharArray())
 
                 val privateKeyInfo = pemObject.decryptPrivateKeyInfo(decryptorProvider)
                 val converter = JcaPEMKeyConverter().setProvider("BC")

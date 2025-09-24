@@ -19,5 +19,3 @@ dependencyResolutionManagement {
 }
 
 include("app")
-
-

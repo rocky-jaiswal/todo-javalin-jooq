@@ -1,10 +1,9 @@
 package dev.rockyj.todo.repository
 
 import org.jooq.Field
-import org.jooq.impl.DSL
 import org.jooq.Table
+import org.jooq.impl.DSL
 import java.time.LocalDate
-
 
 object Tables {
     object Users {

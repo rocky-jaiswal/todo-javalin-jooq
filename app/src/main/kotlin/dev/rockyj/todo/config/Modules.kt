@@ -14,25 +14,26 @@ import dev.rockyj.todo.services.TodoService
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
-val appModule = module {
-    singleOf(::Database)
+val appModule =
+    module {
+        singleOf(::Database)
 
-    singleOf(::JWTService)
-    singleOf(::PasswordService)
+        singleOf(::JWTService)
+        singleOf(::PasswordService)
 
-    singleOf(::UserRepository)
-    singleOf(::TodoRepository)
+        singleOf(::UserRepository)
+        singleOf(::TodoRepository)
 
-    singleOf(::AuthService)
-    singleOf(::TodoService)
+        singleOf(::AuthService)
+        singleOf(::TodoService)
 
-    singleOf(::AuthMiddleware)
+        singleOf(::AuthMiddleware)
 
-    singleOf(::AuthCommand)
-    singleOf(::TodoCommand)
+        singleOf(::AuthCommand)
+        singleOf(::TodoCommand)
 
-    singleOf(::AuthController)
-    singleOf(::TodoController)
+        singleOf(::AuthController)
+        singleOf(::TodoController)
 
-    singleOf(::Routes)
-}
+        singleOf(::Routes)
+    }

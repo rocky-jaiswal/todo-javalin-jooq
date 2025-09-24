@@ -6,6 +6,7 @@ plugins {
     application
 
     id("org.flywaydb.flyway") version "11.11.1"
+    id("org.jlleitschuh.gradle.ktlint") version "13.1.0"
 }
 
 repositories {
@@ -100,27 +101,28 @@ tasks.test {
 }
 
 // Create integration test task
-val integrationTest = tasks.register<Test>("integrationTest") {
-    description = "Runs integration tests"
-    group = "verification"
+val integrationTest =
+    tasks.register<Test>("integrationTest") {
+        description = "Runs integration tests"
+        group = "verification"
 
-    testClassesDirs = sourceSets["integrationTest"].output.classesDirs
-    classpath = sourceSets["integrationTest"].runtimeClasspath
+        testClassesDirs = sourceSets["integrationTest"].output.classesDirs
+        classpath = sourceSets["integrationTest"].runtimeClasspath
 
-    environment("APP_ENV", "test")
+        environment("APP_ENV", "test")
 
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+
+        // Only run integration tests
+        include("**/*IntegrationTest*")
+        include("**/*IT*")
+
+        // Run after unit tests
+        shouldRunAfter(tasks.test)
     }
-
-    // Only run integration tests
-    include("**/*IntegrationTest*")
-    include("**/*IT*")
-
-    // Run after unit tests
-    shouldRunAfter(tasks.test)
-}
 
 // Create a task to run all tests
 tasks.register("testAll") {
@@ -133,7 +135,6 @@ tasks.register("testAll") {
 tasks.check {
     dependsOn(integrationTest)
 }
-
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {

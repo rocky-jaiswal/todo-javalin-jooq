@@ -5,11 +5,9 @@ import dev.rockyj.todo.repository.UserRepository
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
-import org.jooq.Record3
 import org.junit.jupiter.api.Test
 
 class AuthServiceTest {
-
     @Test
     fun user_registration() {
         val userRepository = mockk<UserRepository>()

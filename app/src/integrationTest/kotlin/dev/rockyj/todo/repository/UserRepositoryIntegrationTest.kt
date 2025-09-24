@@ -2,17 +2,16 @@ package dev.rockyj.todo.repository
 
 import dev.rockyj.todo.config.Database
 import dev.rockyj.todo.config.DatabaseTestConfiguration
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.sql.DriverManager
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 
 class UserRepositoryIntegrationTest : DatabaseTestConfiguration() {
-
     private val userRepository: UserRepository = UserRepository(Database())
 
     companion object {
@@ -31,11 +30,12 @@ class UserRepositoryIntegrationTest : DatabaseTestConfiguration() {
     @Test
     fun `should work with the database`() {
         // Your integration test using the migrated database
-        val connection = DriverManager.getConnection(
-            postgres.jdbcUrl,
-            postgres.username,
-            postgres.password
-        )
+        val connection =
+            DriverManager.getConnection(
+                postgres.jdbcUrl,
+                postgres.username,
+                postgres.password,
+            )
 
         // Test your repository methods here
         assertTrue(postgres.isRunning)
@@ -70,6 +70,11 @@ class UserRepositoryIntegrationTest : DatabaseTestConfiguration() {
         val userRepository = UserRepository(Database())
         userRepository.create("test@example.com", "12345678")
 
-        assertThatThrownBy { userRepository.create("test@example.com", "123456789")  }.isInstanceOf(Exception::class.java)
+        assertThatThrownBy {
+            userRepository.create(
+                "test@example.com",
+                "123456789",
+            )
+        }.isInstanceOf(Exception::class.java)
     }
 }

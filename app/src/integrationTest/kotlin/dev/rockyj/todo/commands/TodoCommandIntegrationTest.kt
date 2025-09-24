@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class TodoCommandIntegrationTest : DatabaseTestConfiguration() {
-
     private val db = Database()
     private val userRepository = UserRepository(db)
     private val todoRepository = TodoRepository(db)
@@ -71,5 +70,4 @@ class TodoCommandIntegrationTest : DatabaseTestConfiguration() {
     fun `should update a todo`() {
         // TODO
     }
-
 }
