@@ -9,3 +9,10 @@ Try out -
 - Kompose
 - jooq
 - JDBI (?)
+
+
+Generating keys
+
+❯ openssl genrsa -aes256 -out "private_key_encrypted.pem" -passout pass:"secret" 4096
+
+❯ openssl rsa -in "private_key_encrypted.pem" -passin pass:"secret123" -pubout -out "public_key.pem"

@@ -20,8 +20,8 @@
 - Integration tests (test containers with reuse) ✅
 - Test commands with integration tests ✅
 
-- JSON serialization (Date etc.)
-- Java dates (store and send in UTC)
+- JSON serialization (Date etc.) ✅
+- Java dates (store and send in UTC) ✅
 
 - Good logging (incl. exceptions)
 - Different loggers for local, test, production

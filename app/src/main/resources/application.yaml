@@ -1,6 +1,6 @@
 ktor:
   application:
     modules:
-      - com.example.todo.AppKtorKt.module
+      - dev.rockyj.todo.AppKtorKt.module
   deployment:
     port: 8080

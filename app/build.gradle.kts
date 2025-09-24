@@ -144,7 +144,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "com.example.todo.AppKt"
+    mainClass = "dev.rockyj.todo.AppKt"
 }
 
 tasks.named<Test>("test") {
