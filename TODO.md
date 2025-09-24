@@ -26,9 +26,14 @@
 - Good logging (incl. exceptions)
 - Different loggers for local, test, production
 
-- Lint & editorconfig
+- Lint & editorconfig ✅
 - Gradle cleanup (version lock etc.)
 
 - Check build
 - Docker build (multi-stage) and run
 - Build script (lint, format, unit tests, int. tests, build jar, docker build & run etc.)
+
+## Problems
+
+- The integration tests do not run from command line (testcontainer dynamic urls)
+- The built jar cannot read the pem files from classpath
