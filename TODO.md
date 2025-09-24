@@ -29,10 +29,6 @@
 - Lint & editorconfig ✅
 - Gradle cleanup (version lock etc.)
 
-- Check build
+- Check build ✅
 - Docker build (multi-stage) and run
 - Build script (lint, format, unit tests, int. tests, build jar, docker build & run etc.)
-
-## Problems
-
-- The built jar cannot read the pem files from classpath

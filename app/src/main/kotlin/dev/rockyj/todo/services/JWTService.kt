@@ -13,7 +13,7 @@ import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo
-import java.io.FileReader
+import java.io.InputStream
 import java.security.Security
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
@@ -42,16 +42,16 @@ class JWTService {
 
     init {
         val privateKeyResource =
-            Thread.currentThread().contextClassLoader.getResource(PRIVATE_KEY_FILE)
+            Thread.currentThread().contextClassLoader.getResourceAsStream(PRIVATE_KEY_FILE)
                 ?: throw IllegalArgumentException("File not found!")
 
         val pubKeyResource =
-            Thread.currentThread().contextClassLoader.getResource(PUBLIC_KEY_FILE)
+            Thread.currentThread().contextClassLoader.getResourceAsStream(PUBLIC_KEY_FILE)
                 ?: throw IllegalArgumentException("File not found!")
 
         // Load keys from files
-        val privateKey = loadPrivateKey(privateKeyResource.path, KEY_PASSWORD)
-        val publicKey = loadPublicKey(pubKeyResource.path)
+        val privateKey = loadPrivateKey(privateKeyResource, KEY_PASSWORD)
+        val publicKey = loadPublicKey(pubKeyResource)
 
         // Initialize signer and verifier
         this.signer = RSASSASigner(privateKey)
@@ -122,10 +122,10 @@ class JWTService {
 
     // @Throws(Exception::class)
     private fun loadPrivateKey(
-        filePath: String,
+        fileStream: InputStream,
         passphrase: String,
     ): RSAPrivateKey {
-        FileReader(filePath).use { fileReader ->
+        fileStream.reader().use { fileReader ->
             PEMParser(fileReader).use { pemParser ->
                 val pemObject = pemParser.readObject() as PKCS8EncryptedPrivateKeyInfo
 
@@ -148,8 +148,8 @@ class JWTService {
     }
 
     // @Throws(Exception::class)
-    private fun loadPublicKey(filePath: String): RSAPublicKey {
-        FileReader(filePath).use { fileReader ->
+    private fun loadPublicKey(fileStream: InputStream): RSAPublicKey {
+        fileStream.reader().use { fileReader ->
             PEMParser(fileReader).use { pemParser ->
                 val pemObject: Any? = pemParser.readObject()
                 val converter: JcaPEMKeyConverter = JcaPEMKeyConverter().setProvider("BC")
