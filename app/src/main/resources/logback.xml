@@ -2,7 +2,6 @@
 <configuration>
     <!-- Property definitions -->
     <property name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}"/>
-    <property name="APP_NAME" value="${spring.application.name:-myapp}"/>
     <property name="LOG_PATH" value="${LOG_PATH:-./logs}"/>
 
     <!-- Console Appender with JSON format -->
@@ -11,13 +10,13 @@
             <!-- Custom JSON format -->
             <includeContext>true</includeContext>
             <includeMdc>true</includeMdc>
-            <customFields>{"service":"${APP_NAME}"}</customFields>
+            <customFields>{"service":"todo-api"}</customFields>
 
             <!-- Field names customization -->
             <fieldNames>
                 <timestamp>timestamp</timestamp>
-                <level>level</level>
                 <thread>thread</thread>
+                <level>level</level>
                 <logger>logger</logger>
                 <message>message</message>
                 <mdc>context</mdc>
@@ -27,8 +26,8 @@
             <pattern>
                 {
                 "timestamp": "%d{yyyy-MM-dd'T'HH:mm:ss.SSSX}",
+                "thread": "%{thread}",
                 "level": "%level",
-                "thread": "%thread",
                 "logger": "%logger{36}",
                 "message": "%message",
                 "context": "%X",

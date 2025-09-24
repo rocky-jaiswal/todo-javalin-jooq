@@ -130,12 +130,12 @@ val integrationTest =
 tasks.register("testAll") {
     description = "Runs all tests (unit and integration)"
     group = "verification"
-    dependsOn(tasks.test) // integrationTest)
+    dependsOn(tasks.test, integrationTest)
 }
 
 // Make check depend on integration tests too
 tasks.check {
-    // dependsOn(integrationTest)
+    dependsOn(integrationTest)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

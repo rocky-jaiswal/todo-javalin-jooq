@@ -2,7 +2,7 @@
 <configuration>
     <!-- Property definitions -->
     <property name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}"/>
-    <property name="APP_NAME" value="${spring.application.name:-myapp}"/>
+    <property name="APP_NAME" value="todo-api"/>
     <property name="LOG_PATH" value="${LOG_PATH:-./logs}"/>
 
     <!-- File Appender with JSON format -->
@@ -24,6 +24,29 @@
             <includeContext>true</includeContext>
             <includeMdc>true</includeMdc>
             <customFields>{"service":"${APP_NAME}"}</customFields>
+
+            <!-- Field names customization -->
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+                <thread>thread</thread>
+                <level>level</level>
+                <logger>logger</logger>
+                <message>message</message>
+                <mdc>context</mdc>
+            </fieldNames>
+
+            <!-- Pattern for structured fields -->
+            <pattern>
+                {
+                "timestamp": "%d{yyyy-MM-dd'T'HH:mm:ss.SSSX}",
+                "thread": "%{thread}",
+                "level": "%level",
+                "logger": "%logger{36}",
+                "message": "%message",
+                "context": "%X",
+                "exception": "%ex"
+                }
+            </pattern>
         </encoder>
     </appender>
 

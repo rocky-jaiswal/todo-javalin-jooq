@@ -24,7 +24,7 @@
 - Java dates (store and send in UTC) ✅
 
 - Good logging (incl. exceptions)
-- Different loggers for local, test, production
+- Different loggers for local, test, production ✅
 
 - Lint & editorconfig ✅
 - Gradle cleanup (version lock etc.)
@@ -35,5 +35,4 @@
 
 ## Problems
 
-- The integration tests do not run from command line (testcontainer dynamic urls)
 - The built jar cannot read the pem files from classpath

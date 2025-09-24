@@ -19,15 +19,13 @@ abstract class DatabaseTestConfiguration {
                 withUrlParam("TC_DAEMON", "true")
             }
 
-        @JvmStatic
-        val flyway: Flyway by lazy {
+        fun flyway(): Flyway =
             Flyway
                 .configure()
                 .dataSource(postgres.jdbcUrl, postgres.username, postgres.password)
                 .locations("classpath:db/migrations")
                 .cleanDisabled(false)
                 .load()
-        }
 
         @JvmStatic
         fun setupDatabase() {
@@ -36,7 +34,7 @@ abstract class DatabaseTestConfiguration {
             }
 
             // Run Flyway migrations
-            flyway.migrate()
+            flyway().migrate()
 
             // setup env. var
             System.setProperty("JDBC_URL", postgres.jdbcUrl)
@@ -45,8 +43,8 @@ abstract class DatabaseTestConfiguration {
         @JvmStatic
         fun cleanDatabase() {
             // Clean database between tests if needed
-            flyway.clean()
-            flyway.migrate()
+            flyway().clean()
+            flyway().migrate()
         }
     }
 }
