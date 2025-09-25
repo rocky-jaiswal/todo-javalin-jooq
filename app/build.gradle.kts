@@ -7,6 +7,8 @@ plugins {
 
     id("org.flywaydb.flyway") version "11.11.1"
     id("org.jlleitschuh.gradle.ktlint") version "13.1.0"
+
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.0.20"     // adds open + no-arg support for JPA
 }
 
 repositories {
@@ -18,6 +20,11 @@ dependencies {
     // Javalin + validation bundle
     implementation("io.javalin:javalin:6.7.0")
     implementation("io.javalin:javalin-bundle:6.7.0")
+
+    // Hibernate ORM
+    implementation("org.hibernate.orm:hibernate-core:7.1.1.Final")
+    implementation("jakarta.persistence:jakarta.persistence-api:3.2.0")
+    implementation("jakarta.transaction:jakarta.transaction-api:2.0.1")
 
     // jOOQ runtime
     implementation("org.jooq:jooq:3.20.6")

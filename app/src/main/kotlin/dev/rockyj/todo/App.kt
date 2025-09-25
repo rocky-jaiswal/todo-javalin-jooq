@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import dev.rockyj.todo.config.Database
+import dev.rockyj.todo.config.HibernateConfig
 import dev.rockyj.todo.config.Routes
 import dev.rockyj.todo.config.Secrets
 import dev.rockyj.todo.config.appModule
+import dev.rockyj.todo.entities.User
 import dev.rockyj.todo.middlewares.AuthMiddleware
 import dev.rockyj.todo.middlewares.ExceptionHandler
 import dev.rockyj.todo.middlewares.RequestLogging
@@ -72,4 +74,16 @@ fun main() {
         .exception(Exception::class.java, ExceptionHandler.exceptionHandler())
 
     app.start(Secrets.APP_PORT)
+
+    val sessionFactory = HibernateConfig.sessionFactory
+    sessionFactory.use { factory ->
+        factory.openSession().use { session ->
+            session.beginTransaction()
+            val query = session.createQuery("from User where email = :email", User::class.java)
+            query.setParameter("email", "demo@example.com")
+            val results = query.resultList
+
+            results.forEach { println(it) }
+        }
+    }
 }
